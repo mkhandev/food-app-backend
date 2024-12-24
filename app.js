@@ -66,8 +66,8 @@ app.post("/orders", async (req, res) => {
     id: (Math.random() * 1000).toString(),
   };
 
-//   const orders = await fs.readFile("./data/orders.json", "utf8");
-//   const allOrders = JSON.parse(orders);
+  //   const orders = await fs.readFile("./data/orders.json", "utf8");
+  //   const allOrders = JSON.parse(orders);
 
   const orders = await fs.readFile(ordersFilePath, "utf8");
   const allOrders = JSON.parse(orders);
@@ -75,7 +75,19 @@ app.post("/orders", async (req, res) => {
   allOrders.push(newOrder);
   //await fs.writeFile("./data/orders.json", JSON.stringify(allOrders));
   await fs.writeFile(ordersFilePath, JSON.stringify(allOrders));
+
   res.status(201).json({ message: "Order created!" });
+});
+
+app.get("/debug/orders", async (req, res) => {
+  try {
+    const ordersFilePath = join(__dirname, "data", "orders.json");
+    const orders = await fs.readFile(ordersFilePath, "utf8");
+    res.json({ orders: JSON.parse(orders) });
+  } catch (err) {
+    console.error("Error reading orders file:", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
 app.use((req, res) => {
