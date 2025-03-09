@@ -57,6 +57,9 @@ app.get("/debug/images", async (req, res) => {
   }
 });
 
+// Serve static images
+app.use("/images", express.static(path.join(__dirname, "public", "images")));
+
 // Meals endpoint
 app.get("/meals", async (req, res) => {
   try {
