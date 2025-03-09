@@ -9,6 +9,7 @@ import express from "express";
 const app = express();
 
 app.use(bodyParser.json());
+
 //app.use(express.static("public"));
 app.use("/images", express.static("public/images"));
 
