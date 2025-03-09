@@ -10,7 +10,7 @@ const app = express();
 
 app.use(bodyParser.json());
 //app.use(express.static("public"));
-app.use('/images', express.static('public/images'));
+app.use("/images", express.static("public/images"));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -99,4 +99,9 @@ app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
-app.listen(3000);
+//app.listen(3000);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

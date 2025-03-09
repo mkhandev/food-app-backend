@@ -1,1 +1,1 @@
-[]
+[{"items":[{"id":"m3","name":"Caesar Salad","price":"7.99","description":"Romaine lettuce tossed in Caesar dressing, topped with croutons and parmesan shavings.","image":"images/caesar-salad.jpg","quantity":4},{"id":"m2","name":"Margherita Pizza","price":"12.99","description":"A classic pizza with fresh mozzarella, tomatoes, and basil on a thin and crispy crust.","image":"images/margherita-pizza.jpg","quantity":11}],"customer":{"name":"asa","email":"mkhancse@gmail.com","street":"asas","postal-code":"121","city":"gghgh"},"id":"518.7742148458443"}]
