@@ -3,13 +3,19 @@ import fs from "node:fs/promises";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
+import path from "path";
+
 import bodyParser from "body-parser";
 import express from "express";
 
 const app = express();
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const mealsFilePath = join(__dirname, "data", "available-meals.json");
+const ordersFilePath = join(__dirname, "data", "orders.json");
+
 app.use(bodyParser.json());
-app.use(express.static("backend/public"));
+app.use(express.static(path.join(__dirname, "public")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -17,10 +23,6 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   next();
 });
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const mealsFilePath = join(__dirname, "data", "available-meals.json");
-const ordersFilePath = join(__dirname, "data", "orders.json");
 
 // Root route
 app.get("/", (req, res) => {
