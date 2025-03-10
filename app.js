@@ -1,7 +1,10 @@
-const fs = require("fs/promises");
+import fs from "node:fs/promises";
 
-const bodyParser = require("body-parser");
-const express = require("express");
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+import bodyParser from "body-parser";
+import express from "express";
 
 const app = express();
 
@@ -15,9 +18,30 @@ app.use((req, res, next) => {
   next();
 });
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const mealsFilePath = join(__dirname, "data", "available-meals.json");
+const ordersFilePath = join(__dirname, "data", "orders.json");
+
+// Root route
+app.get("/", (req, res) => {
+  res.json({
+    message: "Welcome to the Food App API!",
+    endpoints: {
+      meals: "/meals",
+      orders: "/orders",
+      debugOrders: "/debug/orders",
+    },
+  });
+});
+
 app.get("/meals", async (req, res) => {
-  const meals = await fs.readFile("backend/data/available-meals.json", "utf8");
-  res.json(JSON.parse(meals));
+  try {
+    const meals = await fs.readFile(mealsFilePath, "utf8");
+    res.json(JSON.parse(meals));
+  } catch (err) {
+    console.error("Error reading meals file:", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
 app.post("/orders", async (req, res) => {
@@ -53,11 +77,25 @@ app.post("/orders", async (req, res) => {
     ...orderData,
     id: (Math.random() * 1000).toString(),
   };
-  const orders = await fs.readFile("backend/data/orders.json", "utf8");
+
+  const orders = await fs.readFile(ordersFilePath, "utf8");
   const allOrders = JSON.parse(orders);
+
   allOrders.push(newOrder);
-  await fs.writeFile("backend/data/orders.json", JSON.stringify(allOrders));
+  await fs.writeFile(ordersFilePath, JSON.stringify(allOrders));
+
   res.status(201).json({ message: "Order created!" });
+});
+
+app.get("/debug/orders", async (req, res) => {
+  try {
+    const ordersFilePath = join(__dirname, "data", "orders.json");
+    const orders = await fs.readFile(ordersFilePath, "utf8");
+    res.json({ orders: JSON.parse(orders) });
+  } catch (err) {
+    console.error("Error reading orders file:", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
 app.use((req, res) => {
