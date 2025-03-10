@@ -7,6 +7,7 @@ import path from "path";
 
 import bodyParser from "body-parser";
 import express from "express";
+import { log } from "node:console";
 
 const app = express();
 
@@ -49,12 +50,14 @@ app.get("/meals", async (req, res) => {
 app.post("/orders", async (req, res) => {
   const orderData = req.body.order;
 
-  if (
-    orderData === null ||
-    orderData.items === null ||
-    orderData.items.length === 0
-  ) {
-    return res.status(400).json({ message: "Missing data." });
+  if (!orderData) {
+    return res.status(400).json({ message: "Missing order data." });
+  }
+
+  if (!orderData.items || orderData.items.length === 0) {
+    return res
+      .status(400)
+      .json({ message: "Missing or empty items in order." });
   }
 
   if (
