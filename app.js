@@ -94,13 +94,23 @@ app.post("/orders", async (req, res) => {
     id: (Math.random() * 1000).toString(),
   };
 
-  const orders = await fs.readFile(ordersFilePath, "utf8");
-  const allOrders = JSON.parse(orders);
+  //const orders = await fs.readFile(ordersFilePath, "utf8");
+  //const allOrders = JSON.parse(orders);
+
+  // Read existing orders
+  let allOrders = [];
+  try {
+    const ordersData = await fs.readFile(ordersFilePath, "utf8");
+    allOrders = JSON.parse(ordersData);
+  } catch (err) {
+    if (err.code !== "ENOENT") {
+      throw err; // Re-throw if the error is not "file not found"
+    }
+  }
 
   allOrders.push(newOrder);
 
   await fs.writeFile(ordersFilePath, JSON.stringify(allOrders));
-  return res.status(400).json({ message: newOrder });
 
   res.status(201).json({ message: "Order created!" });
 });
