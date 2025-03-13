@@ -9,11 +9,22 @@ import bodyParser from "body-parser";
 import express from "express";
 import { log } from "node:console";
 
+import cors from "cors";
+
 const app = express();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const mealsFilePath = join(__dirname, "data", "available-meals.json");
 const ordersFilePath = join(__dirname, "data", "orders.json");
+
+// Enable CORS for all routes
+app.use(
+  cors({
+    origin: "https://food-app-phi-snowy.vercel.app", // Allow requests from your frontend
+    methods: ["GET", "POST"], // Allow only GET and POST requests
+    allowedHeaders: ["Content-Type"], // Allow only specific headers
+  })
+);
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
