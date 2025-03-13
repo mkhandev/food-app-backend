@@ -59,62 +59,63 @@ app.get("/meals", async (req, res) => {
 });
 
 app.post("/orders", async (req, res) => {
-  const orderData = req.body.order;
-
-  if (!orderData) {
-    return res.status(400).json({ message: "Missing order data." });
-  }
-
-  if (!orderData.items || orderData.items.length === 0) {
-    return res
-      .status(400)
-      .json({ message: "Missing or empty items in order." });
-  }
-
-  if (
-    orderData.customer.email === null ||
-    !orderData.customer.email.includes("@") ||
-    orderData.customer.name === null ||
-    orderData.customer.name.trim() === "" ||
-    orderData.customer.street === null ||
-    orderData.customer.street.trim() === "" ||
-    orderData.customer["postal-code"] === null ||
-    orderData.customer["postal-code"].trim() === "" ||
-    orderData.customer.city === null ||
-    orderData.customer.city.trim() === ""
-  ) {
-    return res.status(400).json({
-      message:
-        "Missing data: Email, name, street, postal code or city is missing.",
-    });
-  }
-
-  const newOrder = {
-    ...orderData,
-    id: (Math.random() * 1000).toString(),
-  };
-
-  //const orders = await fs.readFile(ordersFilePath, "utf8");
-  //const allOrders = JSON.parse(orders);
-
-  // Read existing orders
-  let allOrders = [];
   try {
-    const ordersData = await fs.readFile(ordersFilePath, "utf8");
-    allOrders = JSON.parse(ordersData);
-  } catch (err) {
-    if (err.code !== "ENOENT") {
-      throw err; // Re-throw if the error is not "file not found"
+    const orderData = req.body.order;
+
+    // Validate order data
+    if (!orderData || !orderData.items || orderData.items.length === 0) {
+      return res.status(400).json({ message: "Missing data." });
     }
+
+    // Validate customer data
+    if (
+      !orderData.customer ||
+      !orderData.customer.email ||
+      !orderData.customer.email.includes("@") ||
+      !orderData.customer.name ||
+      orderData.customer.name.trim() === "" ||
+      !orderData.customer.street ||
+      orderData.customer.street.trim() === "" ||
+      !orderData.customer["postal-code"] ||
+      orderData.customer["postal-code"].trim() === "" ||
+      !orderData.customer.city ||
+      orderData.customer.city.trim() === ""
+    ) {
+      return res.status(400).json({
+        message:
+          "Missing data: Email, name, street, postal code or city is missing.",
+      });
+    }
+
+    const newOrder = {
+      ...orderData,
+      id: (Math.random() * 1000).toString(),
+    };
+
+    // Read existing orders
+    let allOrders = [];
+    try {
+      const ordersData = await fs.readFile(ordersFilePath, "utf8");
+      allOrders = JSON.parse(ordersData);
+    } catch (err) {
+      if (err.code !== "ENOENT") {
+        throw err; // Re-throw if the error is not "file not found"
+      }
+    }
+
+    // Add the new order
+    allOrders.push(newOrder);
+
+    // Write updated orders to file
+    await fs.writeFile(ordersFilePath, JSON.stringify(allOrders, null, 2));
+
+    res.status(201).json({ message: "Order created!" });
+  } catch (err) {
+    console.error("Error processing order:", err);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: err.message });
   }
-
-  // Add the new order
-  allOrders.push(newOrder);
-
-  // Write updated orders to file
-  await fs.writeFile(ordersFilePath, JSON.stringify(allOrders, null, 2));
-
-  res.status(201).json({ message: "Order created!" });
 });
 
 app.get("/debug/orders", async (req, res) => {
