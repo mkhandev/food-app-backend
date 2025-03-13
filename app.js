@@ -97,6 +97,9 @@ app.post("/orders", async (req, res) => {
   const orders = await fs.readFile(ordersFilePath, "utf8");
   const allOrders = JSON.parse(orders);
 
+  console.log(allOrders);
+  return res.status(400).json({ message: allOrders });
+
   allOrders.push(newOrder);
   await fs.writeFile(ordersFilePath, JSON.stringify(allOrders));
 
