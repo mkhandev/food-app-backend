@@ -108,9 +108,11 @@ app.post("/orders", async (req, res) => {
     }
   }
 
+  // Add the new order
   allOrders.push(newOrder);
 
-  await fs.writeFile(ordersFilePath, JSON.stringify(allOrders));
+  // Write updated orders to file
+  await fs.writeFile(ordersFilePath, JSON.stringify(allOrders, null, 2));
 
   res.status(201).json({ message: "Order created!" });
 });
